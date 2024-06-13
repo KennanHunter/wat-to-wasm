@@ -9,6 +9,12 @@ pub struct Source {
 
 impl From<String> for Source {
     fn from(value: String) -> Self {
+        Self::from(value.as_str())
+    }
+}
+
+impl From<&str> for Source {
+    fn from(value: &str) -> Self {
         let lines = value.split('\n').map(|line| line.to_owned());
 
         Self {

@@ -18,3 +18,27 @@ impl TokenizerError {
         )
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::traits::page_position::PageCursor;
+
+    use super::TokenizerError;
+
+    #[test]
+    fn tokenizer_error_displays() {
+        let err = TokenizerError {
+            unrecognized_character: '\\',
+            cursor: PageCursor::start(),
+        };
+
+        let displayed = err.display("\\ test".into());
+
+        assert_eq!(
+            displayed,
+            r#"Unrecognized character \ found in line:
+1 | \ test
+  | ^"#
+        )
+    }
+}

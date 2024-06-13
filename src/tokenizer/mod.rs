@@ -23,13 +23,21 @@ impl PagePosition for Token {
 pub enum TokenType {
     LeftParen,
     RightParen,
+    LineComment(String),
 }
 
 pub fn generate_tokens(input: Source) -> Result<TokenStore, Vec<TokenizerError>> {
     let mut store = TokenStore::default();
     let mut errors: Vec<TokenizerError> = Vec::new();
 
-    for (character, cursor) in input {
+    let input_iter = &mut input.into_iter().peekable();
+
+    loop {
+        let (character, cursor) = match input_iter.next() {
+            Some(res) => res,
+            None => break,
+        };
+
         match character {
             '(' => store.tokens.push(Token {
                 token_type: TokenType::LeftParen,
@@ -39,6 +47,20 @@ pub fn generate_tokens(input: Source) -> Result<TokenStore, Vec<TokenizerError>>
                 token_type: TokenType::RightParen,
                 cursor,
             }),
+            ';' => {
+                if let Some(_) = &input_iter.next_if(|(char, _)| *char == ';') {
+                    let comment_contents = input_iter
+                        .take_while(|(char, _)| *char != '\n')
+                        .map(|(char, _)| char)
+                        .collect::<String>()
+                        .clone();
+
+                    store.tokens.push(Token {
+                        token_type: TokenType::LineComment(comment_contents),
+                        cursor,
+                    })
+                }
+            }
             char if char.is_ascii_alphabetic() => {}
             ' ' | '\n' => {}
             _ => errors.push(TokenizerError {
