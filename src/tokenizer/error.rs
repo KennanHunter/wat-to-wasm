@@ -1,6 +1,6 @@
 use crate::{source::Source, traits::page_position::PageCursor};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct TokenizerError {
     pub unrecognized_character: char,
     pub cursor: PageCursor,
@@ -13,8 +13,9 @@ impl TokenizerError {
             .expect("tokenizer error should point to valid position");
 
         format!(
-            "Unrecognized character {} found in line:\n{}",
-            self.unrecognized_character, position
+            "Unrecognized character '{}' found in line:\n{}",
+            self.unrecognized_character.escape_debug(),
+            position
         )
     }
 }
@@ -28,16 +29,16 @@ mod tests {
     #[test]
     fn tokenizer_error_displays() {
         let err = TokenizerError {
-            unrecognized_character: '\\',
+            unrecognized_character: '|',
             cursor: PageCursor::start(),
         };
 
-        let displayed = err.display("\\ test".into());
+        let displayed = err.display("| test\n".into());
 
         assert_eq!(
             displayed,
-            r#"Unrecognized character \ found in line:
-1 | \ test
+            r#"Unrecognized character '|' found in line:
+1 | | test
   | ^"#
         )
     }

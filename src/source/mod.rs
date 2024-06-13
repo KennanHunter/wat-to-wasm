@@ -15,7 +15,7 @@ impl From<String> for Source {
 
 impl From<&str> for Source {
     fn from(value: &str) -> Self {
-        let lines = value.split('\n').map(|line| line.to_owned());
+        let lines = value.split_inclusive('\n').map(|line| line.to_owned());
 
         Self {
             lines: Rc::new(lines.collect()),
@@ -38,7 +38,7 @@ impl Source {
         let mut res = String::new();
 
         let line = if let Some(line) = self.lines.get(position.line - 1) {
-            position.line.to_string() + " | " + line
+            position.line.to_string() + " | " + line.trim()
         } else {
             return Err(position);
         };
@@ -74,14 +74,47 @@ impl IntoIterator for Source {
 
 #[derive(Debug)]
 pub struct SourceIter {
-    current_cursor: PageCursor,
+    current_cursor: Option<PageCursor>,
     source: Source,
+}
+
+impl SourceIter {
+    pub fn next_if_char(&mut self, ch: char) -> Option<(char, PageCursor)> {
+        let cursor = match self.current_cursor {
+            Some(cursor) => cursor,
+            None => {
+                let cursor = PageCursor::start();
+
+                return Some((self.source.at_position(PageCursor::start())?, cursor));
+            }
+        };
+
+        let next_position_in_line = cursor.advance_column();
+
+        if let Some(char) = self.source.at_position(next_position_in_line) {
+            if char == ch {
+                self.current_cursor = Some(next_position_in_line);
+                return Some((char, next_position_in_line));
+            }
+        }
+
+        let start_of_next_line = cursor.advance_line();
+
+        if let Some(char) = self.source.at_position(start_of_next_line) {
+            if char == ch {
+                self.current_cursor = Some(start_of_next_line);
+                return Some((char, start_of_next_line));
+            }
+        }
+
+        None
+    }
 }
 
 impl From<Source> for SourceIter {
     fn from(value: Source) -> Self {
         Self {
-            current_cursor: PageCursor::start(),
+            current_cursor: None,
             source: value.clone(),
         }
     }
@@ -91,17 +124,28 @@ impl Iterator for SourceIter {
     type Item = (char, PageCursor);
 
     fn next(&mut self) -> Option<Self::Item> {
-        let next_position_in_line = self.current_cursor.advance_column();
+        let cursor = match self.current_cursor {
+            Some(cursor) => cursor,
+            None => {
+                let cursor = PageCursor::start();
+
+                self.current_cursor = Some(cursor);
+
+                return Some((self.source.at_position(cursor)?, cursor));
+            }
+        };
+
+        let next_position_in_line = cursor.advance_column();
 
         if let Some(char) = self.source.at_position(next_position_in_line) {
-            self.current_cursor = next_position_in_line;
+            self.current_cursor = Some(next_position_in_line);
             return Some((char, next_position_in_line));
         }
 
-        let start_of_next_line = self.current_cursor.advance_line();
+        let start_of_next_line = cursor.advance_line();
 
         if let Some(char) = self.source.at_position(start_of_next_line) {
-            self.current_cursor = start_of_next_line;
+            self.current_cursor = Some(start_of_next_line);
             return Some((char, start_of_next_line));
         }
 

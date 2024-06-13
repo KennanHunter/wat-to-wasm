@@ -2,7 +2,7 @@ pub trait PagePosition {
     fn position(&self) -> PageCursor;
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub struct PageCursor {
     pub line: usize,
     pub column: usize,

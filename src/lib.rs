@@ -8,14 +8,17 @@ mod traits;
 pub fn convert(input: String) -> Result<(), ()> {
     let source = Source::from(input);
 
-    let _tokens = match generate_tokens(source.clone()) {
-        Ok(_) => todo!(),
+    let tokens = match generate_tokens(source.clone()) {
+        Ok(tokens) => tokens,
         Err(errors) => {
             for err in errors {
                 eprintln!("{}", err.display(source.clone()));
             }
+            return Err(());
         }
     };
+
+    dbg!(tokens);
 
     Ok(())
 }
