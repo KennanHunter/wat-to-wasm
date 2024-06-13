@@ -1,5 +1,6 @@
 use error::TokenizerError;
 use token_store::TokenStore;
+use util::char_to_digit;
 
 use crate::{
     source::SourceIter,
@@ -9,6 +10,7 @@ use crate::{
 
 mod error;
 mod tests;
+mod util;
 #[macro_use]
 mod token_store;
 
@@ -30,6 +32,8 @@ pub enum TokenType {
     RightParen,
     SemiColon,
     LineComment(String),
+    String(String),
+    Integer(i32),
 }
 
 pub fn generate_tokens(input: Source) -> Result<TokenStore, Vec<TokenizerError>> {
@@ -43,6 +47,10 @@ pub fn generate_tokens(input: Source) -> Result<TokenStore, Vec<TokenizerError>>
             Some(res) => res,
             None => break,
         };
+
+        if character.is_ascii_whitespace() {
+            continue;
+        }
 
         match tokenize_token(input_iter, character) {
             Some(token_type) => store.tokens.push(Token { token_type, cursor }),
@@ -78,9 +86,35 @@ fn tokenize_token(source_iter: &mut SourceIter, character: char) -> Option<Token
             }
         }
 
-        char if char.is_ascii_whitespace() => None,
-        char if char.is_ascii_whitespace() => None,
+        begin_number if begin_number.is_ascii_digit() => {
+            let number = source_iter
+                .take_while(|(char, _)| char.is_ascii_digit() || *char == '_')
+                .fold(char_to_digit(begin_number), |prev, (digit, _)| {
+                    if digit == '_' {
+                        return prev;
+                    };
 
+                    prev * 10 + char_to_digit(digit)
+                });
+
+            Some(TokenType::Integer(number))
+        }
+
+        '"' => {
+            // TODO: Support hex digits and escape characters in strings
+            let string_contents = source_iter
+                .take_while(|(char, _)| *char != '"')
+                .map(|(char, _)| char)
+                .collect::<String>();
+
+            Some(TokenType::String(string_contents))
+        }
+
+        char if char.is_ascii_alphabetic() => {
+            // Keyword
+
+            None
+        }
         _ => None,
     }
 }

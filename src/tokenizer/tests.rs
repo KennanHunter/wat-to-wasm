@@ -31,3 +31,37 @@ fn test_tokenize_line_comment() {
         })
     );
 }
+
+#[test]
+fn test_parse_number() {
+    let source: Source = "1234".into();
+
+    let res = generate_tokens(source);
+
+    assert_eq!(
+        res,
+        Ok(TokenStore {
+            tokens: vec![Token {
+                token_type: TokenType::Integer(1234),
+                cursor: PageCursor::start()
+            }]
+        })
+    )
+}
+
+#[test]
+fn test_parse_number_with_underscore() {
+    let source: Source = "1_234".into();
+
+    let res = generate_tokens(source);
+
+    assert_eq!(
+        res,
+        Ok(TokenStore {
+            tokens: vec![Token {
+                token_type: TokenType::Integer(1234),
+                cursor: PageCursor::start()
+            }]
+        })
+    )
+}

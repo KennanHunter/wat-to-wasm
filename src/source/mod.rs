@@ -38,7 +38,7 @@ impl Source {
         let mut res = String::new();
 
         let line = if let Some(line) = self.lines.get(position.line - 1) {
-            position.line.to_string() + " | " + line.trim()
+            position.line.to_string() + " | " + line.trim_end()
         } else {
             return Err(position);
         };
