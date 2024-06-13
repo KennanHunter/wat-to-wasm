@@ -1,4 +1,7 @@
-use crate::{source::Source, traits::page_position::PageCursor};
+use crate::{
+    source::Source,
+    traits::{error_display::ErrorDisplay, page_position::PageCursor},
+};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct TokenizerError {
@@ -6,8 +9,8 @@ pub struct TokenizerError {
     pub cursor: PageCursor,
 }
 
-impl TokenizerError {
-    pub fn display(&self, source: Source) -> String {
+impl ErrorDisplay for TokenizerError {
+    fn display(&self, source: Source) -> String {
         let position = source
             .display_position(self.cursor)
             .expect("tokenizer error should point to valid position");
@@ -22,7 +25,7 @@ impl TokenizerError {
 
 #[cfg(test)]
 mod tests {
-    use crate::traits::page_position::PageCursor;
+    use crate::traits::{error_display::ErrorDisplay, page_position::PageCursor};
 
     use super::TokenizerError;
 
