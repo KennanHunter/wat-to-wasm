@@ -82,14 +82,14 @@ type SourceIterItem = (char, PageCursor);
 
 impl SourceIter {
     /// Create a new [String] and populate it until the
-    /// false.
+    /// predicate returns false.
     ///
     /// Differs from [Iterator::take_while] in that it doesn't
     /// advance the iterator past the last character
-    pub fn consume_to_string_while<F>(&mut self, predicate: F) -> String
-    where
-        F: Fn(SourceIterItem) -> bool,
-    {
+    pub fn consume_to_string_while(
+        &mut self,
+        predicate: impl Fn(SourceIterItem) -> bool,
+    ) -> String {
         let mut res = String::new();
 
         loop {
@@ -123,10 +123,10 @@ impl SourceIter {
     }
 
     // TODO: Clean up this function
-    pub fn next_if<F>(&mut self, predicate: F) -> Option<SourceIterItem>
-    where
-        F: Fn(SourceIterItem) -> bool,
-    {
+    pub fn next_if(
+        &mut self,
+        predicate: impl Fn(SourceIterItem) -> bool,
+    ) -> Option<SourceIterItem> {
         let cursor = match self.current_cursor {
             Some(cursor) => cursor,
             None => {
