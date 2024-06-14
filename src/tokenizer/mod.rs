@@ -86,10 +86,10 @@ fn tokenize_token(source_iter: &mut SourceIter, character: char) -> Option<Token
             }
         }
 
-        begin_number if begin_number.is_ascii_digit() => {
+        number_start if number_start.is_ascii_digit() => {
             let number = source_iter
                 .take_while(|(char, _)| char.is_ascii_digit() || *char == '_')
-                .fold(char_to_digit(begin_number), |prev, (digit, _)| {
+                .fold(char_to_digit(number_start), |prev, (digit, _)| {
                     if digit == '_' {
                         return prev;
                     };
@@ -98,6 +98,23 @@ fn tokenize_token(source_iter: &mut SourceIter, character: char) -> Option<Token
                 });
 
             Some(TokenType::Integer(number))
+        }
+        sign_char if sign_char == '+' || sign_char == '-' => {
+            let number = source_iter
+                .take_while(|(char, _)| char.is_ascii_digit() || *char == '_')
+                .fold(0, |prev, (digit, _)| {
+                    if digit == '_' {
+                        return prev;
+                    };
+
+                    prev * 10 + char_to_digit(digit)
+                });
+
+            if sign_char == '+' {
+                Some(TokenType::Integer(number))
+            } else {
+                Some(TokenType::Integer(-number))
+            }
         }
 
         '"' => {

@@ -65,3 +65,20 @@ fn test_parse_number_with_underscore() {
         })
     )
 }
+
+#[test]
+fn test_parse_number_with_negative() {
+    let source: Source = "-1_234".into();
+
+    let res = generate_tokens(source);
+
+    assert_eq!(
+        res,
+        Ok(TokenStore {
+            tokens: vec![Token {
+                token_type: TokenType::Integer(-1234),
+                cursor: PageCursor::start()
+            }]
+        })
+    )
+}
