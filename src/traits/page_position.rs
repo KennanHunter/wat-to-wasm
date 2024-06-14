@@ -1,4 +1,5 @@
 pub trait PagePosition {
+    #[allow(dead_code)]
     fn position(&self) -> PageCursor;
 }
 

@@ -1,6 +1,6 @@
 use error::TokenizerError;
 use token_store::TokenStore;
-use util::char_to_digit;
+use util::{char_to_digit, keyword_to_token_type};
 
 use crate::{
     source::SourceIter,
@@ -33,7 +33,46 @@ pub enum TokenType {
     SemiColon,
     LineComment(String),
     String(String),
-    Integer(i32),
+    IntegerLiteral(i32),
+    Identifier(String),
+    I32,
+    I64,
+    F32,
+    F64,
+    V128,
+    FuncRef,
+    ExternRef,
+    Func,
+    Extern,
+    Module,
+    Result,
+    Param,
+    Mut,
+    Local,
+    Dot,
+    Set,
+    Get,
+    Export,
+    Const,
+    Nan,
+    Inf,
+}
+
+fn is_identifier_character(ch: char) -> bool {
+    match ch {
+        alphanumeric if alphanumeric.is_ascii_alphanumeric() => true,
+        '!' | '#' | '$' | '%' | '&' | '′' | '*' | '+' | '-' | '.' | '/' | ':' | '<' | '=' | '>'
+        | '?' | '@' | '\\' | '^' | '_' | '`' | '|' | '~' => true,
+        _ => false,
+    }
+}
+
+fn is_separator_character(ch: char) -> bool {
+    match ch {
+        whitespace if whitespace.is_ascii_whitespace() => true,
+        '.' | ')' | ';' => true,
+        _ => false,
+    }
 }
 
 pub fn generate_tokens(input: Source) -> Result<TokenStore, Vec<TokenizerError>> {
@@ -86,10 +125,22 @@ fn tokenize_token(source_iter: &mut SourceIter, character: char) -> Option<Token
             }
         }
 
+        '$' => {
+            let identifier_name: String =
+                source_iter.consume_to_string_while(|(ch, _)| is_identifier_character(ch));
+
+            if identifier_name.len() == 0 {
+                // TODO: ensure that empty identifiers can't happen
+            }
+
+            Some(TokenType::Identifier(identifier_name))
+        }
+
         number_start if number_start.is_ascii_digit() => {
             let number = source_iter
-                .take_while(|(char, _)| char.is_ascii_digit() || *char == '_')
-                .fold(char_to_digit(number_start), |prev, (digit, _)| {
+                .consume_to_string_while(|(char, _)| char.is_ascii_digit() || char == '_')
+                .chars()
+                .fold(char_to_digit(number_start), |prev, digit| {
                     if digit == '_' {
                         return prev;
                     };
@@ -97,12 +148,13 @@ fn tokenize_token(source_iter: &mut SourceIter, character: char) -> Option<Token
                     prev * 10 + char_to_digit(digit)
                 });
 
-            Some(TokenType::Integer(number))
+            Some(TokenType::IntegerLiteral(number))
         }
         sign_char if sign_char == '+' || sign_char == '-' => {
             let number = source_iter
-                .take_while(|(char, _)| char.is_ascii_digit() || *char == '_')
-                .fold(0, |prev, (digit, _)| {
+                .consume_to_string_while(|(char, _)| char.is_ascii_digit() || char == '_')
+                .chars()
+                .fold(0, |prev, digit| {
                     if digit == '_' {
                         return prev;
                     };
@@ -111,27 +163,30 @@ fn tokenize_token(source_iter: &mut SourceIter, character: char) -> Option<Token
                 });
 
             if sign_char == '+' {
-                Some(TokenType::Integer(number))
+                Some(TokenType::IntegerLiteral(number))
             } else {
-                Some(TokenType::Integer(-number))
+                Some(TokenType::IntegerLiteral(-number))
             }
         }
 
         '"' => {
             // TODO: Support hex digits and escape characters in strings
-            let string_contents = source_iter
-                .take_while(|(char, _)| *char != '"')
-                .map(|(char, _)| char)
-                .collect::<String>();
+            let string_contents = source_iter.consume_to_string_while(|(char, _)| char != '"');
+
+            source_iter.expect('"').expect("\" should follow string");
 
             Some(TokenType::String(string_contents))
         }
 
-        char if char.is_ascii_alphabetic() => {
-            // Keyword
+        '.' => Some(TokenType::Dot),
 
-            None
+        keyword_start if keyword_start.is_ascii_alphabetic() => {
+            let keyword = keyword_start.to_string()
+                + &source_iter.consume_to_string_while(|(char, _)| !is_separator_character(char));
+
+            keyword_to_token_type(&keyword)
         }
+
         _ => None,
     }
 }

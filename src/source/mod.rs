@@ -78,30 +78,79 @@ pub struct SourceIter {
     source: Source,
 }
 
+type SourceIterItem = (char, PageCursor);
+
 impl SourceIter {
-    pub fn next_if_char(&mut self, ch: char) -> Option<(char, PageCursor)> {
+    /// Create a new [String] and populate it until the
+    /// false.
+    ///
+    /// Differs from [Iterator::take_while] in that it doesn't
+    /// advance the iterator past the last character
+    pub fn consume_to_string_while<F>(&mut self, predicate: F) -> String
+    where
+        F: Fn(SourceIterItem) -> bool,
+    {
+        let mut res = String::new();
+
+        loop {
+            match self.next_if(&predicate) {
+                Some((ch, _)) => res.push(ch),
+                None => break,
+            };
+        }
+
+        res
+    }
+
+    pub fn expect(&mut self, ch: char) -> Result<SourceIterItem, Option<SourceIterItem>> {
+        match self.next() {
+            Some(res) if res.0 == ch => Ok(res),
+            Some(res) => Err(Some(res)),
+            None => Err(None),
+        }
+    }
+
+    pub fn next_if_char(&mut self, ch: char) -> Option<SourceIterItem> {
+        self.next_if(|(next_character, _)| next_character == ch)
+    }
+
+    fn start(&mut self) -> Option<SourceIterItem> {
+        let cursor = PageCursor::start();
+
+        self.current_cursor = Some(cursor);
+
+        return Some((self.source.at_position(cursor)?, cursor));
+    }
+
+    // TODO: Clean up this function
+    pub fn next_if<F>(&mut self, predicate: F) -> Option<SourceIterItem>
+    where
+        F: Fn(SourceIterItem) -> bool,
+    {
         let cursor = match self.current_cursor {
             Some(cursor) => cursor,
             None => {
-                let cursor = PageCursor::start();
+                let start = self.start()?;
 
-                return Some((self.source.at_position(PageCursor::start())?, cursor));
+                return if predicate(start) { Some(start) } else { None };
             }
         };
 
         let next_position_in_line = cursor.advance_column();
 
         if let Some(char) = self.source.at_position(next_position_in_line) {
-            if char == ch {
+            if predicate((char, next_position_in_line)) {
                 self.current_cursor = Some(next_position_in_line);
                 return Some((char, next_position_in_line));
+            } else {
+                return None;
             }
         }
 
         let start_of_next_line = cursor.advance_line();
 
         if let Some(char) = self.source.at_position(start_of_next_line) {
-            if char == ch {
+            if predicate((char, start_of_next_line)) {
                 self.current_cursor = Some(start_of_next_line);
                 return Some((char, start_of_next_line));
             }
@@ -126,13 +175,7 @@ impl Iterator for SourceIter {
     fn next(&mut self) -> Option<Self::Item> {
         let cursor = match self.current_cursor {
             Some(cursor) => cursor,
-            None => {
-                let cursor = PageCursor::start();
-
-                self.current_cursor = Some(cursor);
-
-                return Some((self.source.at_position(cursor)?, cursor));
-            }
+            None => return self.start(),
         };
 
         let next_position_in_line = cursor.advance_column();

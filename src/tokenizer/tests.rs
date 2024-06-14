@@ -33,6 +33,39 @@ fn test_tokenize_line_comment() {
 }
 
 #[test]
+fn test_tokenize_string() {
+    let source: Source = "\"string contents\"()".into();
+
+    let res = generate_tokens(dbg!(source));
+
+    assert_eq!(
+        res,
+        Ok(TokenStore {
+            tokens: vec![
+                Token {
+                    token_type: TokenType::String("string contents".to_string()),
+                    cursor: PageCursor { line: 1, column: 0 }
+                },
+                Token {
+                    token_type: TokenType::LeftParen,
+                    cursor: PageCursor {
+                        line: 1,
+                        column: 17
+                    }
+                },
+                Token {
+                    token_type: TokenType::RightParen,
+                    cursor: PageCursor {
+                        line: 1,
+                        column: 18
+                    }
+                }
+            ]
+        })
+    );
+}
+
+#[test]
 fn test_parse_number() {
     let source: Source = "1234".into();
 
@@ -42,7 +75,7 @@ fn test_parse_number() {
         res,
         Ok(TokenStore {
             tokens: vec![Token {
-                token_type: TokenType::Integer(1234),
+                token_type: TokenType::IntegerLiteral(1234),
                 cursor: PageCursor::start()
             }]
         })
@@ -59,7 +92,7 @@ fn test_parse_number_with_underscore() {
         res,
         Ok(TokenStore {
             tokens: vec![Token {
-                token_type: TokenType::Integer(1234),
+                token_type: TokenType::IntegerLiteral(1234),
                 cursor: PageCursor::start()
             }]
         })
@@ -76,9 +109,35 @@ fn test_parse_number_with_negative() {
         res,
         Ok(TokenStore {
             tokens: vec![Token {
-                token_type: TokenType::Integer(-1234),
+                token_type: TokenType::IntegerLiteral(-1234),
                 cursor: PageCursor::start()
             }]
+        })
+    )
+}
+
+#[test]
+fn test_parse_identifier_name() {
+    let source: Source = "$epic-identifier>=<&@!%^&)".into();
+
+    let res = generate_tokens(source);
+
+    assert_eq!(
+        res,
+        Ok(TokenStore {
+            tokens: vec![
+                Token {
+                    token_type: TokenType::Identifier("epic-identifier>=<&@!%^&".to_string()),
+                    cursor: PageCursor::start()
+                },
+                Token {
+                    token_type: TokenType::RightParen,
+                    cursor: PageCursor {
+                        column: 25,
+                        line: 1,
+                    }
+                }
+            ]
         })
     )
 }
