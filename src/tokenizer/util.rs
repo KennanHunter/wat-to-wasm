@@ -22,6 +22,15 @@ pub fn keyword_to_token_type(name: &str) -> Option<TokenType> {
     lookup.insert("get", TokenType::Get);
     lookup.insert("set", TokenType::Set);
 
+    lookup.insert("block", TokenType::Block);
+    lookup.insert("loop", TokenType::Loop);
+    lookup.insert("if", TokenType::If);
+
+    lookup.insert("unreachable", TokenType::Unreachable);
+    lookup.insert("return", TokenType::Return);
+
+    lookup.insert("add", TokenType::Add);
+
     // Types
     lookup.insert("i32", TokenType::I32);
     lookup.insert("i64", TokenType::I64);

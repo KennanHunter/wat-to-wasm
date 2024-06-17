@@ -1,6 +1,5 @@
 use source::Source;
 use tokenizer::generate_tokens;
-use traits::error_display::ErrorDisplay;
 
 mod source;
 mod tokenizer;

@@ -4,12 +4,12 @@ use crate::{
 };
 
 #[derive(Debug, Clone, PartialEq)]
-pub struct TokenizerError {
+pub struct UnrecognizedTokenError {
     pub unrecognized_character: char,
     pub cursor: PageCursor,
 }
 
-impl ErrorDisplay for TokenizerError {
+impl ErrorDisplay for UnrecognizedTokenError {
     fn display(&self, source: Source) -> String {
         let position = source
             .display_position(self.cursor)
@@ -23,15 +23,35 @@ impl ErrorDisplay for TokenizerError {
     }
 }
 
+#[derive(Debug, Clone, PartialEq)]
+pub struct UnrecognizedKeywordError {
+    pub unrecognized_keyword: String,
+    pub cursor: PageCursor,
+}
+
+impl ErrorDisplay for UnrecognizedKeywordError {
+    fn display(&self, source: Source) -> String {
+        let position = source
+            .display_position(self.cursor)
+            .expect("tokenizer error should point to valid position");
+
+        format!(
+            "Unrecognized keyword \"{}\" found in line:\n{}",
+            self.unrecognized_keyword.escape_debug().collect::<String>(),
+            position
+        )
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use crate::traits::{error_display::ErrorDisplay, page_position::PageCursor};
 
-    use super::TokenizerError;
+    use super::UnrecognizedTokenError;
 
     #[test]
     fn tokenizer_error_displays() {
-        let err = TokenizerError {
+        let err = UnrecognizedTokenError {
             unrecognized_character: '|',
             cursor: PageCursor::start(),
         };
