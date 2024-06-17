@@ -1,6 +1,7 @@
 use source::Source;
 use tokenizer::generate_tokens;
 
+mod parser;
 mod source;
 mod tokenizer;
 mod traits;

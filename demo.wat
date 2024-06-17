@@ -1,3 +1,4 @@
+;; A simple addition script to test WASM with
 (module
     (func $add (param $a i32) (param $b i32) (result i32)
         (local.get $a) 

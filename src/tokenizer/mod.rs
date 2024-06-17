@@ -15,7 +15,7 @@ mod errors;
 mod tests;
 mod util;
 #[macro_use]
-mod token_store;
+pub mod token_store;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Token {
