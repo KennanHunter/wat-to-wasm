@@ -33,7 +33,7 @@ impl PagePosition for Token {
 pub enum TokenType {
     LeftParen,
     RightParen,
-    SemiColon,
+    SemiColon, // TODO: Do i need this?
     LineComment(String),
     String(String),
     IntegerLiteral(i32),

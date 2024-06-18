@@ -32,6 +32,6 @@ impl Iterator for TokenIter {
     type Item = Token;
 
     fn next(&mut self) -> Option<Self::Item> {
-        todo!()
+        self.token_iter.get(self.cursor + 1).cloned()
     }
 }

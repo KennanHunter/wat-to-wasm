@@ -1,4 +1,7 @@
-use crate::tokenizer::token_store::{TokenIter, TokenStore};
+use crate::tokenizer::{
+    token_store::{TokenIter, TokenStore},
+    TokenType,
+};
 
 type Tokens<'a> = &'a mut TokenIter;
 
@@ -7,5 +10,10 @@ pub fn parse_tokens(mut tokens: TokenStore) {
 }
 
 fn parse_expression(tokens: Tokens) {
-    todo!()
+    let token = tokens.next().unwrap();
+
+    match token.token_type {
+        TokenType::LeftParen => {}
+        _ => todo!(),
+    }
 }

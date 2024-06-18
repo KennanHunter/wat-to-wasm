@@ -1,4 +1,4 @@
-use std::{env, fs};
+use std::{env, fs, time::Instant};
 
 use wat_to_wasm::convert;
 
@@ -18,7 +18,17 @@ fn main() {
         return;
     };
 
-    convert(source).unwrap();
+    let start_time = Instant::now();
+
+    match convert(source) {
+        Ok(_) => {
+            println!(
+                "Conversion successful in {}μs",
+                start_time.elapsed().as_micros()
+            )
+        }
+        Err(_) => todo!(),
+    }
 }
 
 fn read_file(path: &str) -> Result<String, std::io::Error> {
