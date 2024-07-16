@@ -1,4 +1,10 @@
-use super::Token;
+use crate::{
+    parser::errors::{ExpectedIdentifierError, ExpectedStringError, ExpectedTokenError},
+    shared::Identifier,
+    traits::page_position::PageCursor,
+};
+
+use super::{Token, TokenType};
 
 #[derive(Debug, PartialEq)]
 pub struct TokenStore {
@@ -28,10 +34,78 @@ pub struct TokenIter {
     cursor: usize,
 }
 
+impl TokenIter {
+    pub fn peek(&self) -> Option<Token> {
+        self.token_iter.get(self.cursor).cloned()
+    }
+
+    pub fn guess_cursor(&self) -> Option<PageCursor> {
+        // TODO: Make this smarter... detect when cursor should advance
+        self.token_iter
+            .get(self.cursor - 1)
+            .map(|token| token.cursor)
+    }
+
+    pub fn consume_identifier(
+        &mut self,
+    ) -> Result<(Identifier, PageCursor), ExpectedIdentifierError> {
+        match self.peek() {
+            Some(token) => match token.token_type {
+                TokenType::Identifier(id) => {
+                    self.next();
+
+                    Ok((id, token.cursor))
+                }
+                _ => Err(ExpectedIdentifierError {
+                    cursor: token.cursor,
+                }),
+            },
+            None => todo!(),
+        }
+    }
+
+    pub fn consume_string(&mut self) -> Result<(String, PageCursor), ExpectedStringError> {
+        match self.peek() {
+            Some(token) => match token.token_type {
+                TokenType::String(literal) => {
+                    self.next();
+
+                    Ok((literal, token.cursor))
+                }
+                _ => Err(ExpectedStringError {
+                    cursor: token.cursor,
+                }),
+            },
+            None => todo!(),
+        }
+    }
+
+    /// Only advances if the next token matches the `expected_token_type`
+    pub fn consume(&mut self, expected_token_type: TokenType) -> Result<Token, ExpectedTokenError> {
+        if self
+            .peek()
+            .is_some_and(|token| token.token_type == expected_token_type)
+        {
+            Ok(self.next().unwrap())
+        } else {
+            Err(ExpectedTokenError {
+                expected_token: expected_token_type,
+                cursor: self
+                    .guess_cursor()
+                    .expect("should be able to estimate Cursor to display ExpectedTokenError"),
+            })
+        }
+    }
+}
+
 impl Iterator for TokenIter {
     type Item = Token;
 
     fn next(&mut self) -> Option<Self::Item> {
-        self.token_iter.get(self.cursor + 1).cloned()
+        let res = self.token_iter.get(self.cursor).cloned();
+
+        self.cursor += 1;
+
+        res
     }
 }

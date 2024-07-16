@@ -2,6 +2,7 @@ use source::Source;
 use tokenizer::generate_tokens;
 
 mod parser;
+mod shared;
 mod source;
 mod tokenizer;
 mod traits;
@@ -32,7 +33,16 @@ pub fn convert(input: String) -> Result<(), ()> {
         }
     };
 
-    dbg!(tokens);
+    let tree = match parser::parse_tokens(tokens) {
+        Ok(tree) => tree,
+        Err(err) => {
+            eprintln!("{}", err.display(source));
+
+            return Err(());
+        }
+    };
+
+    dbg!(tree);
 
     Ok(())
 }

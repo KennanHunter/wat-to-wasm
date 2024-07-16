@@ -3,6 +3,7 @@ use token_store::TokenStore;
 use util::{char_to_digit, keyword_to_token_type};
 
 use crate::{
+    shared::Identifier,
     source::SourceIter,
     traits::{
         error_display::ErrorDisplay,
@@ -37,7 +38,7 @@ pub enum TokenType {
     LineComment(String),
     String(String),
     IntegerLiteral(i32),
-    Identifier(String),
+    Identifier(Identifier),
     I32,
     I64,
     F32,
@@ -143,7 +144,7 @@ fn tokenize_token(
                 // TODO: ensure that empty identifiers can't happen
             }
 
-            Ok(TokenType::Identifier(identifier_name))
+            Ok(TokenType::Identifier(Identifier(identifier_name)))
         }
 
         number_start if number_start.is_ascii_digit() => {

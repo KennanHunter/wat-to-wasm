@@ -127,7 +127,9 @@ fn test_parse_identifier_name() {
         (TokenStore {
             tokens: vec![
                 Token {
-                    token_type: TokenType::Identifier("epic-identifier>=<&@!%^&".to_string()),
+                    token_type: TokenType::Identifier(
+                        "epic-identifier>=<&@!%^&".to_string().into()
+                    ),
                     cursor: PageCursor::start()
                 },
                 Token {

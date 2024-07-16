@@ -3,6 +3,7 @@ pub trait PagePosition {
     fn position(&self) -> PageCursor;
 }
 
+// TODO: Rename
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct PageCursor {
     pub line: usize,

@@ -127,7 +127,7 @@ impl SourceIter {
         &mut self,
         predicate: impl Fn(SourceIterItem) -> bool,
     ) -> Option<SourceIterItem> {
-        let cursor = match self.current_cursor {
+        let cursor: PageCursor = match self.current_cursor {
             Some(cursor) => cursor,
             None => {
                 let start = self.start()?;
