@@ -14,7 +14,7 @@ impl ErrorDisplay for ExpectedTokenError {
     fn display(&self, source: Source) -> String {
         let position = source
             .display_position(self.cursor)
-            .expect("tokenizer error should point to valid position");
+            .expect("parser error should point to valid position");
 
         format!(
             "Expected token {:?} in line:\n{}",
@@ -32,7 +32,7 @@ impl ErrorDisplay for ExpectedIdentifierError {
     fn display(&self, source: Source) -> String {
         let position = source
             .display_position(self.cursor)
-            .expect("tokenizer error should point to valid position");
+            .expect("parser error should point to valid position");
 
         format!("Expected identifier in line:\n{}", position)
     }
@@ -47,7 +47,7 @@ impl ErrorDisplay for ExpectedStringError {
     fn display(&self, source: Source) -> String {
         let position = source
             .display_position(self.cursor)
-            .expect("tokenizer error should point to valid position");
+            .expect("parser error should point to valid position");
 
         format!("Expected string in line:\n{}", position)
     }
