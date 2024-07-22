@@ -1,0 +1,13 @@
+pub mod container;
+
+pub enum ByteValue {
+    I32 = 0x7F,
+    I64 = 0x7E,
+    F32 = 0x7D,
+    F64 = 0x7C,
+    MUTABLE = 0x01,
+    IMMUTABLE = 0x00,
+}
+
+pub static MAGIC_BYTES: [u8; 4] = [0x00, 0x61, 0x73, 0x6D];
+pub static WASM_VERSION: [u8; 4] = [0x01, 0x00, 0x00, 0x00];
