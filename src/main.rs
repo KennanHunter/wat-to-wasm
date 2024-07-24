@@ -5,13 +5,13 @@ use wat_to_wasm::convert;
 fn main() {
     let args: Vec<String> = env::args().collect();
 
-    let file_path = match args.len() {
-        2.. => args.get(2).unwrap(),
-        1 => "./demo.wat",
-        0 => unreachable!(),
+    let file_path = match &args[0..2] {
+        [_, name, ..] => name,
+        [_] => "./demo.wat",
+        [] => unreachable!(),
     };
 
-    let source = if let Ok(file_contents) = read_file(file_path) {
+    let source = if let Ok(file_contents) = read_file(&file_path) {
         file_contents
     } else {
         eprintln!("Failed to open file");
