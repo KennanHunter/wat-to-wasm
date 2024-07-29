@@ -5,7 +5,7 @@ use wat_to_wasm::convert;
 fn main() {
     let args: Vec<String> = env::args().collect();
 
-    let file_path = match &args[0..2] {
+    let file_path = match &args.as_slice() {
         [_, name, ..] => name,
         [_] => "./demo.wat",
         [] => unreachable!(),

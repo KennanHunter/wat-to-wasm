@@ -33,7 +33,7 @@ pub fn convert(input: String) -> Result<(), ()> {
         }
     };
 
-    let tree = match parser::parse_tokens(tokens) {
+    let syntax_tree = match parser::parse_tokens(tokens) {
         Ok(tree) => tree,
         Err(err) => {
             eprintln!("{}", err.display(source));
@@ -42,7 +42,7 @@ pub fn convert(input: String) -> Result<(), ()> {
         }
     };
 
-    dbg!(tree);
+    dbg!(syntax_tree);
 
     Ok(())
 }

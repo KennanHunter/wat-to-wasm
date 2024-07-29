@@ -11,7 +11,7 @@ pub struct Module {
 
 #[derive(Debug)]
 pub struct FunctionDefinition {
-    id: Identifier,
+    id: Option<Identifier>,
 }
 
 #[derive(Debug)]
