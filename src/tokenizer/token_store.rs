@@ -1,7 +1,9 @@
 use crate::{
-    parser::errors::{ExpectedIdentifierError, ExpectedStringError, ExpectedTokenError},
+    parser::errors::{
+        ExpectedIdentifierError, ExpectedStringError, ExpectedTokenError, ExpectedTypeError,
+    },
     shared::Identifier,
-    traits::page_position::PageCursor,
+    traits::{error_display::ErrorDisplay, page_position::PageCursor},
 };
 
 use super::{Token, TokenType};
@@ -64,6 +66,22 @@ impl TokenIter {
         }
     }
 
+    pub fn consume_type(&mut self) -> Result<Token, ExpectedTypeError> {
+        match self.peek() {
+            Some(token) => match &token.token_type {
+                TokenType::I32 | TokenType::I64 | TokenType::F32 | TokenType::F64 => {
+                    self.next();
+
+                    Ok(token)
+                }
+                _ => Err(ExpectedTypeError {
+                    cursor: token.cursor,
+                }),
+            },
+            None => todo!(),
+        }
+    }
+
     pub fn consume_string(&mut self) -> Result<(String, PageCursor), ExpectedStringError> {
         match self.peek() {
             Some(token) => match token.token_type {
@@ -81,19 +99,22 @@ impl TokenIter {
     }
 
     /// Only advances if the next token matches the `expected_token_type`
-    pub fn consume(&mut self, expected_token_type: TokenType) -> Result<Token, ExpectedTokenError> {
+    pub fn consume(
+        &mut self,
+        expected_token_type: TokenType,
+    ) -> Result<Token, Box<dyn ErrorDisplay>> {
         if self
             .peek()
             .is_some_and(|token| token.token_type == expected_token_type)
         {
             Ok(self.next().unwrap())
         } else {
-            Err(ExpectedTokenError {
+            Err(Box::new(ExpectedTokenError {
                 expected_token: expected_token_type,
                 cursor: self
                     .guess_cursor()
                     .expect("should be able to estimate Cursor to display ExpectedTokenError"),
-            })
+            }))
         }
     }
 }

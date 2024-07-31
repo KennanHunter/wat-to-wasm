@@ -1,6 +1,6 @@
 use std::{env, fs, time::Instant};
 
-use wat_to_wasm::convert;
+use wat_to_wasm::compile;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -12,6 +12,7 @@ fn main() {
     };
 
     let source = if let Ok(file_contents) = read_file(&file_path) {
+        println!("Compiling file {}", file_path);
         file_contents
     } else {
         eprintln!("Failed to open file");
@@ -20,14 +21,17 @@ fn main() {
 
     let start_time = Instant::now();
 
-    match convert(source) {
+    match compile(source) {
         Ok(_) => {
             println!(
-                "Conversion successful in {}μs",
+                "Compilation successful in {}μs",
                 start_time.elapsed().as_micros()
             )
         }
-        Err(_) => todo!(),
+        Err(_) => eprintln!(
+            "Compilation failed in {}μs",
+            start_time.elapsed().as_micros()
+        ),
     }
 }
 

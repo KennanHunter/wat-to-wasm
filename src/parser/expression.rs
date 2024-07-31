@@ -1,5 +1,7 @@
 use crate::shared::Identifier;
 
+use super::instructions::{BuiltinType, InstructionType};
+
 pub struct UnaryOperation {
     operand: Expr,
 }
@@ -11,7 +13,8 @@ pub struct Module {
 
 #[derive(Debug)]
 pub struct FunctionDefinition {
-    id: Option<Identifier>,
+    pub id: Option<Identifier>,
+    pub body: Vec<Expr>,
 }
 
 #[derive(Debug)]
@@ -21,9 +24,18 @@ pub struct Export {
 }
 
 #[derive(Debug)]
+pub struct Param {
+    pub id: Identifier,
+    pub parameter_type: BuiltinType,
+}
+
+#[derive(Debug)]
 pub enum Expr {
     Module(Module),
     Func(FunctionDefinition),
     FuncReference(Identifier),
     Export(Box<Export>),
+    Param(Box<Param>),
+    Result(BuiltinType),
+    LocalGet(Identifier),
 }

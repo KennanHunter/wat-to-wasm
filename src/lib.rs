@@ -16,11 +16,11 @@ mod traits;
 /// # Examples
 ///
 /// ```
-/// use wat_to_wasm::convert;
+/// use wat_to_wasm::compile;
 ///
-/// convert("(module)".to_owned());
+/// compile("(module)".to_owned());
 /// ```
-pub fn convert(input: String) -> Result<(), ()> {
+pub fn compile(input: String) -> Result<(), ()> {
     let source = Source::from(input);
 
     let tokens = match generate_tokens(source.clone()) {
