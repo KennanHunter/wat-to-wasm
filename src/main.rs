@@ -11,7 +11,7 @@ fn main() {
         [] => unreachable!(),
     };
 
-    let source = if let Ok(file_contents) = read_file(&file_path) {
+    let source = if let Ok(file_contents) = read_file(file_path) {
         println!("Compiling file {}", file_path);
         file_contents
     } else {

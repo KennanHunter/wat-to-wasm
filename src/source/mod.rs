@@ -26,10 +26,7 @@ impl From<&str> for Source {
 impl Source {
     pub fn at_position(&self, position: PageCursor) -> Option<char> {
         match (*self.lines).get(position.line - 1) {
-            Some(line) => match line.chars().nth(position.column) {
-                Some(char) => Some(char),
-                None => None,
-            },
+            Some(line) => line.chars().nth(position.column),
             None => None,
         }
     }
@@ -119,7 +116,7 @@ impl SourceIter {
 
         self.current_cursor = Some(cursor);
 
-        return Some((self.source.at_position(cursor)?, cursor));
+        Some((self.source.at_position(cursor)?, cursor))
     }
 
     // TODO: Clean up this function

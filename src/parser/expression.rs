@@ -1,6 +1,6 @@
 use crate::shared::Identifier;
 
-use super::instructions::{BuiltinType, InstructionType};
+use super::instructions::BuiltinType;
 
 pub struct UnaryOperation {
     operand: Expr,

@@ -2,10 +2,9 @@ pub mod errors;
 mod expression;
 mod instructions;
 mod rules;
-use core::panic;
-use std::{any::Any, vec};
+use std::vec;
 
-use errors::{ExpectedMethodError, ExpectedTokenError, ExpectedTypeError};
+use errors::ExpectedMethodError;
 use expression::{Export, Expr, FunctionDefinition, Module, Param};
 use instructions::BuiltinType;
 

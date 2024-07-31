@@ -107,7 +107,7 @@ pub fn generate_tokens(input: Source) -> Result<TokenStore, Vec<Box<dyn ErrorDis
         }
     }
 
-    if errors.len() > 0 {
+    if !errors.is_empty() {
         Err(errors)
     } else {
         Ok(store)
@@ -140,7 +140,7 @@ fn tokenize_token(
             let identifier_name: String =
                 source_iter.consume_to_string_while(|(ch, _)| is_identifier_character(ch));
 
-            if identifier_name.len() == 0 {
+            if identifier_name.is_empty() {
                 // TODO: ensure that empty identifiers can't happen
             }
 
