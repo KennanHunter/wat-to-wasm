@@ -13,7 +13,6 @@ pub struct TokenStore {
     pub tokens: Vec<Token>,
 }
 
-
 impl IntoIterator for TokenStore {
     type Item = Token;
     type IntoIter = TokenIter;

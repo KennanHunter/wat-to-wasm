@@ -116,10 +116,7 @@ fn parse_expression(tokens: Tokens) -> Result<Expr, Box<dyn ErrorDisplay>> {
                 tokens.consume(TokenType::RightParen)?;
 
                 match method.token_type {
-                    TokenType::Get => match tokens.consume_identifier() {
-                        Ok((id, _)) => Ok(Expr::LocalGet(id)),
-                        Err(err) => return Err(Box::new(err)),
-                    },
+                    TokenType::Get => Ok(Expr::LocalGet(id)),
 
                     _ => Err(Box::new(ExpectedMethodError {
                         cursor: method.cursor,
