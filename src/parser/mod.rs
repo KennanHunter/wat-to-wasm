@@ -5,7 +5,7 @@ mod rules;
 use std::vec;
 
 use errors::ExpectedMethodError;
-use expression::{Export, Expr, FunctionDefinition, Module, Param};
+use expression::{Export, Expr, FunctionDefinition, IntOp, Module, Param};
 use instructions::BuiltinType;
 
 use crate::{
@@ -121,6 +121,20 @@ fn parse_expression(tokens: Tokens) -> Result<Expr, Box<dyn ErrorDisplay>> {
                     _ => Err(Box::new(ExpectedMethodError {
                         cursor: method.cursor,
                         methods: vec!["get"],
+                    })),
+                }
+            }
+
+            TokenType::I32 => {
+                tokens.consume(TokenType::Dot)?;
+
+                let method = tokens.next().unwrap();
+
+                match method.token_type {
+                    TokenType::Add => Ok(Expr::IntOp(BuiltinType::I32, IntOp::Add)),
+                    _ => Err(Box::new(ExpectedMethodError {
+                        cursor: method.cursor,
+                        methods: vec!["add"],
                     })),
                 }
             }

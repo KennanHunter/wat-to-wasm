@@ -38,4 +38,11 @@ pub enum Expr {
     Param(Box<Param>),
     Result(BuiltinType),
     LocalGet(Identifier),
+    IntOp(BuiltinType, IntOp),
+}
+
+// https://github.com/WebAssembly/spec/blob/1291af309889a5900cdad9c38526e457cb77eac3/interpreter/syntax/ast.ml#L26
+#[derive(Debug)]
+pub enum IntOp {
+    Add,
 }
