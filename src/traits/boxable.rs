@@ -1,9 +1,6 @@
-use crate::{
-    parser::errors::{
-        ExpectedIdentifierError, ExpectedMethodError, ExpectedStringError, ExpectedTokenError,
-        ExpectedTypeError,
-    },
-    tokenizer::token_store::TokenStore,
+use crate::parser::errors::{
+    ExpectedIdentifierError, ExpectedMethodError, ExpectedStringError, ExpectedTokenError,
+    ExpectedTypeError,
 };
 
 macro_rules! define_boxable_conversion {

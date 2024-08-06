@@ -89,11 +89,8 @@ impl SourceIter {
     ) -> String {
         let mut res = String::new();
 
-        loop {
-            match self.next_if(&predicate) {
-                Some((ch, _)) => res.push(ch),
-                None => break,
-            };
+        while let Some((ch, _)) = self.next_if(&predicate) {
+            res.push(ch)
         }
 
         res

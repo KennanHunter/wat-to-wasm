@@ -91,12 +91,7 @@ pub fn generate_tokens(input: Source) -> Result<TokenStore, Vec<Box<dyn ErrorDis
 
     let input_iter = &mut input.into_iter();
 
-    loop {
-        let (character, cursor) = match input_iter.next() {
-            Some(res) => res,
-            None => break,
-        };
-
+    while let Some((character, cursor)) = input_iter.next() {
         if character.is_ascii_whitespace() {
             continue;
         }
