@@ -1,29 +1,8 @@
-use std::fmt::Debug;
-
 use super::{MAGIC_BYTES, WASM_VERSION};
 
+#[derive(Default)]
 pub struct BytecodeContainer {
     pub data: Vec<u8>,
-}
-
-impl Default for BytecodeContainer {
-    fn default() -> Self {
-        Self {
-            data: Default::default(),
-        }
-    }
-}
-
-impl Debug for BytecodeContainer {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.write_str("BytecodeContainer = {\n")?;
-
-        f.write_str("\tBytecode ")?;
-
-        f.write_str(&format!("{:#X?}", self.data))?;
-
-        f.write_str("\n}")
-    }
 }
 
 impl From<Vec<u8>> for BytecodeContainer {

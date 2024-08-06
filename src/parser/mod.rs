@@ -1,5 +1,5 @@
 pub mod errors;
-mod expression;
+pub mod expression;
 mod instructions;
 mod rules;
 use std::vec;

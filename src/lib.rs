@@ -1,6 +1,8 @@
 use source::Source;
 use tokenizer::generate_tokens;
 
+pub mod bytecode;
+pub mod compiler;
 mod parser;
 mod shared;
 mod source;
@@ -42,7 +44,14 @@ pub fn compile(input: String) -> Result<(), ()> {
         }
     };
 
-    dbg!(syntax_tree);
+    match compiler::compile(syntax_tree) {
+        Ok(tree) => tree,
+        Err(err) => {
+            eprintln!("{}", err.display(source));
+
+            return Err(());
+        }
+    };
 
     Ok(())
 }

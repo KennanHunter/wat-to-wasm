@@ -5,7 +5,7 @@ pub enum InstructionType {
     Div(SignedAware),
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum BuiltinType {
     I32,
     F32,
