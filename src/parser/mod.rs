@@ -36,10 +36,7 @@ fn parse_expression(tokens: Tokens) -> Result<Expr, Box<dyn ErrorDisplay>> {
             })),
 
             TokenType::Func => {
-                let id = match tokens.consume_identifier() {
-                    Ok((id, _)) => id,
-                    Err(err) => return Err(Box::new(err)),
-                };
+                let (id, _) = tokens.consume_identifier()?;
 
                 if tokens.consume(TokenType::RightParen).is_ok() {
                     return Ok(Expr::FuncReference(id));
@@ -51,10 +48,7 @@ fn parse_expression(tokens: Tokens) -> Result<Expr, Box<dyn ErrorDisplay>> {
             }
 
             TokenType::Export => {
-                let name = match tokens.consume_string() {
-                    Ok((literal, _)) => literal,
-                    Err(err) => return Err(Box::new(err)),
-                };
+                let (name, _) = tokens.consume_string()?;
 
                 Ok(Expr::Export(Box::new(Export {
                     name,
@@ -63,13 +57,10 @@ fn parse_expression(tokens: Tokens) -> Result<Expr, Box<dyn ErrorDisplay>> {
             }
 
             TokenType::Param => {
-                let id = match tokens.consume_identifier() {
-                    Ok((id, _)) => id,
-                    Err(err) => return Err(Box::new(err)),
-                };
+                let (id, _) = tokens.consume_identifier()?;
 
-                let parameter_type = match tokens.consume_type() {
-                    Ok(token) => match token.token_type {
+                let parameter_type = match tokens.consume_type()? {
+                    token => match token.token_type {
                         TokenType::I32 => BuiltinType::I32,
                         TokenType::F32 => BuiltinType::F32,
                         TokenType::I64 => BuiltinType::I64,
@@ -77,7 +68,6 @@ fn parse_expression(tokens: Tokens) -> Result<Expr, Box<dyn ErrorDisplay>> {
 
                         _ => unreachable!("Every token that consume_type returns should be convertible to a BuiltinType"),
                     },
-                    Err(err) => return Err(Box::new(err)),
                 };
 
                 tokens.consume(TokenType::RightParen)?;
@@ -86,8 +76,8 @@ fn parse_expression(tokens: Tokens) -> Result<Expr, Box<dyn ErrorDisplay>> {
             }
 
             TokenType::Result => {
-                let parameter_type = match tokens.consume_type() {
-                    Ok(token) => match token.token_type {
+                let parameter_type = match tokens.consume_type()? {
+                    token => match token.token_type {
                         TokenType::I32 => BuiltinType::I32,
                         TokenType::F32 => BuiltinType::F32,
                         TokenType::I64 => BuiltinType::I64,
@@ -95,7 +85,6 @@ fn parse_expression(tokens: Tokens) -> Result<Expr, Box<dyn ErrorDisplay>> {
 
                         _ => unreachable!("Every token that consume_type returns should be convertible to a BuiltinType"),
                     },
-                    Err(err) => return Err(Box::new(err)),
                 };
 
                 tokens.consume(TokenType::RightParen)?;
@@ -108,10 +97,7 @@ fn parse_expression(tokens: Tokens) -> Result<Expr, Box<dyn ErrorDisplay>> {
 
                 let method = tokens.next().unwrap();
 
-                let id = match tokens.consume_identifier() {
-                    Ok((id, _)) => id,
-                    Err(err) => return Err(Box::new(err)),
-                };
+                let (id, _) = tokens.consume_identifier()?;
 
                 tokens.consume(TokenType::RightParen)?;
 
